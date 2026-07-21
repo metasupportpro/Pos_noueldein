@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم الإدارة الشاملة والمتجاوبة</title>
+<style>
+  :root {
+    --bg-main: #111827;
+    --bg-card: #1f2937;
+    --border-color: #374151;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --primary: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+    padding-bottom: 30px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+  
+  /* شاشة تسجيل الدخول */
+  #loginScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .login-box {
+    background: var(--bg-card);
+    padding: 30px 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #4b5563;
+    background: var(--bg-main);
+    color: #fff;
+    box-sizing: border-box;
+    font-size: 15px;
+  }
+  .login-box button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  /* لوحة الإدارة */
+  #adminDashboard {
+    display: none;
+  }
+  
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .header-actions button {
+    flex: 1;
+    min-width: 140px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .btn-logout { background: var(--danger); color: white; }
+  .btn-print-all { background: var(--primary); color: white; }
+
+  /* بطاقات الإحصائيات */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    padding: 15px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+  }
+  .stat-card h4 { margin: 0 0 8px 0; color: var(--text-muted); font-size: 13px; font-weight: 500; }
+  .stat-card h2 { margin: 0; color: var(--success); font-size: 18px; font-weight: bold; }
+
+  /* جدول وفواتير الأجهزة الكبيرة */
+  .table-container {
+    display: none;
+    background: var(--bg-card);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  th { background: #374151; color: var(--text-main); }
+  
+  /* تصميم عرض المنتجات داخل الجدول */
+  .items-list-table {
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    display: inline-block;
+    width: 100%;
+    max-width: 250px;
+    box-sizing: border-box;
+  }
+  .items-list-table div {
+    border-bottom: 1px dashed #374151;
+    padding: 3px 0;
+  }
+  .items-list-table div:last-child { border: none; }
+
+  /* بطاقات الموبايل للفواتير */
+  .mobile-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .invoice-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+  }
+  .card-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .card-items-box {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 13px;
+  }
+  .card-item-line {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    padding: 4px 0;
+    border-bottom: 1px dashed #374151;
+  }
+  .card-item-line:last-child { border: none; }
+  
+  .card-label { color: var(--text-muted); }
+  .card-value { font-weight: 600; }
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid #374151;
+    padding-top: 10px;
+  }
+  
+  .btn-action { 
+    flex: 1;
+    padding: 8px; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-size: 13px; 
+    font-weight: bold;
+    text-align: center;
+  }
+  .btn-delete { background: var(--danger); color: white; }
+  .btn-print { background: var(--warning); color: black; }
+
+  /* الاستعلامات للشاشات المتوسطة والكبيرة (الكمبيوتر والآيباد) */
+  @media(min-width: 768px) {
+    .header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-actions { flex-wrap: nowrap; }
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+    .table-container { display: block; }
+    .mobile-cards-container { display: none; }
+  }
+
+  /* تنسيق الطباعة الحرارية الصارمة مقاس 80mm */
+  #printSection { display: none; }
+  @media print {
+    body { background: white !important; color: black !important; font-size: 12px; }
+    #loginScreen, #adminDashboard { display: none !important; }
+    #printSection { display: block !important; width: 80mm; margin: 0 auto; }
+    .print-table { width: 100%; border-collapse: collapse; }
+    .print-table th, .print-table td { border-bottom: 1px dashed #000; padding: 4px 0; text-align: right; }
+  }
+</style>
+</head>
+<body>
+
+<!-- شاشة تسجيل دخول المسؤول -->
+<div id="loginScreen" style="display:none;">
+  <div class="login-box">
+    <h3>تسجيل دخول الإدارة</h3>
+    <p style="font-size:12px; color:var(--text-muted); margin: -5px 0 15px 0;">الرجاء استخدام بريد ورمز الـ Admin لتخطي الأمان</p>
+    <input type="email" id="adminEmail" placeholder="البريد الإلكتروني للـ Admin">
+    <input type="password" id="adminPassword" placeholder="كلمة المرور">
+    <button onclick="loginAdmin()">تسجيل الدخول</button>
+  </div>
+</div>
+
+<!-- لوحة التحكم المتجاوبة -->
+<div class="container" id="adminDashboard">
+  <div class="header">
+    <div>
+      <h2 style="margin:0 0 5px 0; font-size:22px;">لوحة الإدارة - جرد ومبيعات</h2>
+      <div id="adminInfo" style="font-size: 13px; color: var(--text-muted);"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-print-all" onclick="printAll()">🖨 طباعة تقرير اليوم (Reading)</button>
+      <button class="btn-logout" onclick="logoutAdmin()">خروج ✕</button>
+    </div>
+  </div>
+
+  <!-- شبكة الإحصائيات المتجاوبة -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h4>عدد الطلبات</h4>
+      <h2 id="totalOrders">0</h2>
+    </div>
+    <div class="stat-card">
+      <h4>المبيعات ($)</h4>
+      <h2 id="totalSalesUSD">0.00$</h2>
+    </div>
+    <div class="stat-card">
+      <h4>المبيعات (ل.ل)</h4>
+      <h2 id="totalSalesLBP" style="color: #3b82f6;">0 ل.ل</h2>
+    </div>
+    <div class="stat-card">
+      <h4>صافي الربح</h4>
+      <h2 id="totalProfit" style="color: var(--warning);">0.00$</h2>
+    </div>
+  </div>
+
+  <h3 style="margin:20px 0 12px 0; font-size:18px;">فواتير العمليات الصادرة اليوم بالتفصيل</h3>
+  
+  <!-- العرض المخصص لشاشات الكمبيوتر والتابلت الكبيرة -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>رقم الطلب</th>
+          <th>الوقت</th>
+          <th>المنتجات المطلوبة</th>
+          <th>الكاشير</th>
+          <th>المبلغ الصافي ($)</th>
+          <th>الربح ($)</th>
+          <th>خيارات الإدارة</th>
+        </tr>
+      </thead>
+      <tbody id="invoicesTable">
+        <!-- الفواتير تحقن هنا -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- العرض الذكي المخصص للهواتف المحمولة -->
+  <div class="mobile-cards-container" id="mobileCards">
+    <!-- كروت الموبايل تحقن هنا تلقائياً -->
+  </div>
+</div>
+
+<!-- حاوية الطباعة المعزولة 80mm -->
+<div id="printSection"></div>
+
+<!-- مكتبات ربط خوادم وقواعد Firebase المعتمدة بنظامك -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBQBGGtON-RNk4qH2Pws3RBBBE3cH3J4PU",
+  authDomain: "store-app-d05fa.firebaseapp.com",
+  projectId: "store-app-d05fa",
+  storageBucket: "store-app-d05fa.firebasestorage.app",
+  messagingSenderId: "257385912042",
+  appId: "1:257385912042:web:bc30397b745340e31e2993"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let todaysSales = [];
+let currentUser = null;
+
+// مراقبة تخطي القواعد الأمنية والحصول على Token الأدمن
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    if (userDoc.exists && userDoc.data().role === 'admin') {
+      currentUser = user;
+      document.getElementById("adminInfo").innerText = "الحساب الحالي: " + user.email;
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("adminDashboard").style.display = "block";
+      loadTodaysData();
+    } else {
+      alert("عذراً، هذا الحساب لا يمتلك رتبة Admin في المنظومة لفتح الصلاحيات.");
+      await auth.signOut();
+    }
+  } else {
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("adminDashboard").style.display = "none";
+  }
+});
+
+async function loginAdmin() {
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value.trim();
+  if(!email || !password) return alert("الرجاء كتابة البريد وكلمة المرور");
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (error) {
+    alert("فشل الدخول: خطأ في بيانات حساب المدير المسؤول.");
+  }
+}
+
+function logoutAdmin() { auth.signOut(); }
+
+// تحميل البيانات الحية للعمليات الصادرة اليوم
+function loadTodaysData() {
+  const today = new Date().toISOString().split('T')[0];
+  
+  db.collection("sales").where("date", "==", today)
+    .onSnapshot(snapshot => {
+      todaysSales = [];
+      let totalUSD = 0, totalLBP = 0, totalCost = 0;
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        data.id = doc.id;
+        todaysSales.push(data);
+        
+        totalUSD += (data.totalUSD || 0);
+        totalLBP += (data.totalLBP || 0);
+        
+        if (data.items) {
+          data.items.forEach(item => {
+            totalCost += (item.cost || 0) * (item.qty || 0);
+          });
+        }
+      });
+
+      todaysSales.sort((a, b) => b.createdAt - a.createdAt);
+
+      document.getElementById("totalOrders").innerText = todaysSales.length;
+      document.getElementById("totalSalesUSD").innerText = totalUSD.toFixed(2) + "$";
+      document.getElementById("totalSalesLBP").innerText = totalLBP.toLocaleString() + " ل.ل";
+      document.getElementById("totalProfit").innerText = (totalUSD - totalCost).toFixed(2) + "$";
+
+      renderDataViews();
+    });
+}
+
+// دالة لبناء واجهات العرض (جدول للكمبيوتر وكروت للموبايل) لضمان التجاوب وعرض المنتجات والوقت
+function renderDataViews() {
+  const tbody = document.getElementById("invoicesTable");
+  const mobileContainer = document.getElementById("mobileCards");
+  
+  tbody.innerHTML = "";
+  mobileContainer.innerHTML = "";
+
+  todaysSales.forEach(sale => {
+    let cost = 0;
+    let tableItemsHtml = "";
+    let mobileItemsHtml = "";
+
+    // جرد وتفصيل المنتجات المطلوبة داخل الفاتورة
+    if (sale.items) {
+      sale.items.forEach(item => {
+        cost += (item.cost || 0) * (item.qty || 0);
+        tableItemsHtml += `<div>🔸 ${item.name} (x${item.qty})</div>`;
+        mobileItemsHtml += `
+          <div class="card-item-line">
+            <span>${item.name}</span>
+            <span>x${item.qty} (${item.total.toFixed(2)}$)</span>
+          </div>
+        `;
+      });
+    }
+    
+    const profit = (sale.totalUSD || 0) - cost;
+    const time = sale.createdAt ? new Date(sale.createdAt.toDate()).toLocaleTimeString('ar-LB') : "مباشر";
+    const cashier = sale.user ? sale.user.split('@')[0] : "مجهول";
+
+    // 1. بناء السطر المخصص لشاشات الكمبيوتر الكبيرة
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><b>${sale.orderNumber}</b></td>
+      <td><span style="color:var(--text-muted); font-size:12px;">🕒 ${time}</span></td>
+      <td><div class="items-list-table">${tableItemsHtml || 'لا توجد منتجات'}</div></td>
+      <td>${cashier}</td>
+      <td style="color:var(--success); font-weight:bold;">${(sale.totalUSD || 0).toFixed(2)}$</td>
+      <td style="color:var(--warning);">${profit.toFixed(2)}$</td>
+      <td>
+        <button class="btn-action btn-print" onclick="printInvoice('${sale.id}')">طباعة</button>
+        <button class="btn-action btn-delete" onclick="deleteInvoice('${sale.id}')">إلغاء</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+
+    // 2. بناء كرت متجاوب ومنفصل تماماً يناسب تصفح الهواتف باللمس مع عرض المنتجات والوقت
+    const card = document.createElement("div");
+    card.className = "invoice-card";
+    card.innerHTML = `
+      <div class="card-row">
+        <span class="card-label">رقم الطلب والوقت:</span>
+        <span class="card-value" style="color:var(--primary);">${sale.orderNumber} <small style="color:var(--text-muted); font-weight:normal;">(${time})</small></span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">الكاشير المسؤول:</span>
+        <span class="card-value">${cashier}</span>
+      </div>
+      
+      <div class="card-items-box">
+        <div style="font-weight:bold; margin-bottom:5px; color:var(--text-main); font-size:12px;">📦 الأصناف المطلوبة:</div>
+        ${mobileItemsHtml || '<div style="color:var(--danger)">لا توجد منتجات مسجلة</div>'}
+      </div>
+
+      <div class="card-row">
+        <span class="card-label">المبلغ الصافي:</span>
+        <span class="card-value" style="color:var(--success);">${(sale.totalUSD || 0).toFixed(2)}$</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">ربح العملية:</span>
+        <span class="card-value" style="color:var(--warning);">${profit.toFixed(2)}$</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-action btn-print" onclick="printInvoice('${sale.id}')">🖨 إعادة طباعة</button>
+        <button class="btn-action btn-delete" onclick="deleteInvoice('${sale.id}')">🗑 إلغاء وحذف</button>
+      </div>
+    `;
+    mobileContainer.appendChild(card);
+  });
+}
+
+// إلغاء الفاتورة بالكامل وإعادة تحديث وضخ الكميات في المخازن
+async function deleteInvoice(docId) {
+  if (confirm("هل تريد إلغاء هذه الفاتورة؟ (سيتم إرجاع كمية البضائع للمخزن وحذف القيمة المالية)")) {
+    try {
+      const saleToCancel = todaysSales.find(s => s.id === docId);
+      
+      await db.runTransaction(async (transaction) => {
+        for (const item of saleToCancel.items) {
+          if (!item.productId) continue;
+          const productRef = db.collection("products").doc(item.productId);
+          const productDoc = await transaction.get(productRef);
+          
+          if (productDoc.exists) {
+            const currentStock = productDoc.data().stock || 0;
+            transaction.update(productRef, { stock: currentStock + item.qty });
+          }
+        }
+        transaction.delete(db.collection("sales").doc(docId));
+      });
+      alert("تمت العملية: تم حذف الفاتورة وتعديل جرد المخزون.");
+    } catch (error) {
+      alert("فشل الإلغاء: " + error.message);
+    }
+  }
+}
+
+// طباعة حرارية 80mm لفاتورة منفردة
+function printInvoice(docId) {
+  const sale = todaysSales.find(s => s.id === docId);
+  if (!sale) return;
+  const dateStr = sale.createdAt ? new Date(sale.createdAt.toDate()).toLocaleString('ar-LB') : "الآن";
+  
+  let html = `
+    <div style="font-family:'Courier New', monospace; text-align:center; direction:rtl; color:#000;">
+      <h2 style="margin:5px 0; font-size:15px;">نسخة الإدارة - إعادة طباعة</h2>
+      <p style="margin:2px 0;">رقم المعاملة: ${sale.orderNumber}</p>
+      <p style="margin:2px 0;">الوقت: ${dateStr}</p>
+      <hr style="border-top: 1px dashed #000;">
+      <table class="print-table">
+        <tr><th style="text-align:right;">الصنف</th><th style="text-align:center;">العدد</th><th style="text-align:left;">السعر</th></tr>
+  `;
+  sale.items.forEach(item => {
+    html += `<tr><td style="text-align:right;">${item.name}</td><td style="text-align:center;">x${item.qty}</td><td style="text-align:left;">${item.total.toFixed(2)}$</td></tr>`;
+  });
+  html += `
+      </table>
+      <hr style="border-top: 1px dashed #000;">
+      <h3 style="margin:5px 0; text-align:left; display:flex; justify-content:space-between;"><span>الصافي الإجمالي:</span> <span>${sale.totalUSD.toFixed(2)}$</span></h3>
+    </div>
+  `;
+  document.getElementById("printSection").innerHTML = html;
+  window.print();
+}
+
+// طباعة تقرير الجرد الكامل لليوم (Reading)
+function printAll() {
+  const dateStr = new Date().toLocaleDateString('ar-LB');
+  const totalOrders = document.getElementById("totalOrders").innerText;
+  const totalUSD = document.getElementById("totalSalesUSD").innerText;
+  const totalLBP = document.getElementById("totalSalesLBP").innerText;
+  const totalProfit = document.getElementById("totalProfit").innerText;
+
+  let html = `
+    <div style="font-family:'Courier New', monospace; text-align:center; direction:rtl; color:#000;">
+      <h2 style="margin:5px 0; font-size:16px;">تقرير الإدارة العام (Reading)</h2>
+      <p style="margin:2px 0;">التاريخ: ${dateStr}</p>
+      <hr style="border-top: 1px dashed #000;">
+      <div style="text-align:right; font-size:13px; line-height:1.6;">
+        <p><b>إجمالي عدد الفواتير:</b> ${totalOrders}</p>
+        <p><b>المبيعات الإجمالية بالدولار:</b> ${totalUSD}</p>
+        <p><b>المبيعات الإجمالية باللبناني:</b> ${totalLBP}</p>
+        <p style="border-top:1px solid #000; padding-top:4px;"><b>صافي أرباح اليوم الصافية:</b> ${totalProfit}</p>
+      </div>
+      <hr style="border-top: 1px dashed #000;">
+      <table class="print-table" style="font-size:11px;">
+        <tr><th style="text-align:right;">الطلب</th><th style="text-align:center;">الكاشير</th><th style="text-align:left;">المبلغ</th></tr>
+  `;
+  todaysSales.forEach(sale => {
+    html += `<tr><td style="text-align:right;">${sale.orderNumber}</td><td style="text-align:center;">${sale.user ? sale.user.split('@')[0] : 'كاشير'}</td><td style="text-align:left;">${sale.totalUSD.toFixed(2)}$</td></tr>`;
+  });
+  html += `
+      </table>
+      <hr style="border-top: 1px dashed #000;">
+      <p style="margin-top:10px; font-size:11px; font-weight:bold;">نهاية التقرير المالي للإدارة</p>
+    </div>
+  `;
+  document.getElementById("printSection").innerHTML = html;
+  window.print();
+}
+</script>
+</body>
+</html>
